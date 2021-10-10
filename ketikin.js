@@ -4,7 +4,7 @@ const ketikin = (selector, options) => {
     const defaultTimeGap = 1000
 
     const invisibleChar = '&lrm;'
-    const cursor = '<span id="ketikin-cursor">|</span>'
+    const cursorID = 'ketikin-cursor'
 
     options = Object.assign({
         texts: [],
@@ -19,26 +19,43 @@ const ketikin = (selector, options) => {
         return speed
     }
 
-    getCursors = (element) => {
-        return element.querySelectorAll('#ketikin-cursor')
+    createCursor = () => {
+        let cursor = document.createElement("span")
+        let cursorContent = document.createTextNode("|")
+
+        cursor.id = cursorID
+        cursor.appendChild(cursorContent)
+
+        return cursor
     }
 
-    removeCursors = (element) => {
-        getCursors(element).forEach(bar => bar.remove())
+    getCursor = (element) => {
+        return element.querySelector('#' + cursorID) || document.createElement("cursor")
+    }
+
+    animateCursor = (element) => {
+        getCursor(element).animate([{opacity: 0.5}], {
+            duration: defaultTimeGap,
+            iterations: Infinity
+        })
+    }
+
+    removeCursor = (element) => {
+        getCursor(element).remove()
+    }
+
+    addCursor = (element) => {
+        element.appendChild(createCursor())
     }
 
     addTypingChar = (element, char) => {
         element.innerHTML = element.innerHTML + char
-        removeCursors(element)
-    }
-
-    addCursor = (element) => {
-        element.innerHTML = element.innerHTML + cursor
+        removeCursor(element)
     }
 
     swapTypingText = (element, text) => {
         element.innerHTML = text
-        removeCursors(element)
+        removeCursor(element)
     }
 
     type = (element, char, executionTime) => {
@@ -99,6 +116,8 @@ const ketikin = (selector, options) => {
 
         if(options.loop) {
             setTimeout(() => playOrchestration(element, texts), executionTime)
+        } else {
+            setTimeout(() => animateCursor(element), executionTime)
         }
     }
 
