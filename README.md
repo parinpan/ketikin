@@ -27,7 +27,7 @@ Ketikin is a lightweight Javascript library to help you create a typewriter anim
 ```html
 <script>
     ketikin("p", {
-        text: "Hey, it's written by Ketikin 👋",
+        texts: ["Hey, it's written by Ketikin 👋", "It's an awesomeness! 😍"],
         speed: 70,
         loop: true
     })

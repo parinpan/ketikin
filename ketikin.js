@@ -1,5 +1,5 @@
 const ketikin = (selector, options) => {
-    const baseTypingSpeed = 25
+    const baseTypingSpeed = 5
     const maxTypingSpeed = 100
     const defaultTimeGap = 1000
 
@@ -7,7 +7,7 @@ const ketikin = (selector, options) => {
     const typingBar = '<span id="ketikin-bar">|</span>'
 
     options = Object.assign({
-        text: null,
+        texts: [],
         speed: 0,
         loop: false
     }, options)
@@ -56,9 +56,8 @@ const ketikin = (selector, options) => {
         return lastExecutionTime + Math.floor(Math.random() * adjustSpeed(options.speed)) + speedBaseline
     }
 
-    orchestrate = (element, text) => {
+    orchestrate = (element, text, shouldBackSpacing, executionTime) => {
         let typingText = text
-        let executionTime = 0
 
         // clear text first before typing
         clearText(element)
@@ -67,27 +66,39 @@ const ketikin = (selector, options) => {
             type(element, char, executionTime)
             executionTime = arrangeExecutionTime(executionTime, baseTypingSpeed)
         }
-        
-        if(options.loop) {
-            executionTime = executionTime + defaultTimeGap
+
+        if(shouldBackSpacing) {
             backSpacingSpeed = baseTypingSpeed
+            executionTime = executionTime + defaultTimeGap
             
             while(typingText) {
                 typingText = backSpace(element, typingText, executionTime)
                 executionTime = arrangeExecutionTime(executionTime, backSpacingSpeed)
-                backSpacingSpeed = Math.floor(backSpacingSpeed * 0.7)    
+                backSpacingSpeed = Math.floor(backSpacingSpeed * 0.7)
             }
 
+            // clear residual text
             setTimeout(() => swapTypingText(element, typingText) | addTypingBar(element), executionTime)
-            setTimeout(() => orchestrate(element, text), executionTime + defaultTimeGap)
-
-            return
         }
 
-        setTimeout(() => removeTypingBar(element), executionTime)
+        return executionTime
+    }
+
+    playOrchestration = (element, texts) => {
+        let executionTime = 0
+        let shouldBackSpacing = false
+
+        texts.forEach((text, index) => {
+            shouldBackSpacing = (index < texts.length - 1 && !options.loop) || options.loop
+            executionTime = orchestrate(element, text, shouldBackSpacing, executionTime) + defaultTimeGap
+        })
+
+        if(options.loop) {
+            setTimeout(() => playOrchestration(element, texts), executionTime)
+        }
     }
 
     document.querySelectorAll(selector).forEach(element => {
-        orchestrate(element, options.text || element.innerText)
+        playOrchestration(element, (options.texts || [element.innerText]).filter(text => text))
     })
 }
