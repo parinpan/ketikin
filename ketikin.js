@@ -4,7 +4,7 @@ const ketikin = (selector, options) => {
     const defaultTimeGap = 1000
 
     const invisibleChar = '&lrm;'
-    const typingBar = '<span id="ketikin-bar">|</span>'
+    const cursor = '<span id="ketikin-cursor">|</span>'
 
     options = Object.assign({
         texts: [],
@@ -19,32 +19,36 @@ const ketikin = (selector, options) => {
         return speed
     }
 
-    removeTypingBar = (element) => {
-        element.querySelectorAll('#ketikin-bar').forEach(bar => bar.remove())
+    getCursors = (element) => {
+        return element.querySelectorAll('#ketikin-cursor')
+    }
+
+    removeCursors = (element) => {
+        getCursors(element).forEach(bar => bar.remove())
     }
 
     addTypingChar = (element, char) => {
         element.innerHTML = element.innerHTML + char
-        removeTypingBar(element)
+        removeCursors(element)
     }
 
-    addTypingBar = (element) => {
-        element.innerHTML = element.innerHTML + typingBar
+    addCursor = (element) => {
+        element.innerHTML = element.innerHTML + cursor
     }
 
     swapTypingText = (element, text) => {
         element.innerHTML = text
-        removeTypingBar(element)
+        removeCursors(element)
     }
 
     type = (element, char, executionTime) => {
         setTimeout(() => addTypingChar(element, char), executionTime)
-        setTimeout(() => addTypingBar(element), executionTime)
+        setTimeout(() => addCursor(element), executionTime)
     }
 
     backSpace = (element, text, executionTime) => {
         setTimeout(() => swapTypingText(element, text), executionTime)
-        setTimeout(() => addTypingBar(element), executionTime)
+        setTimeout(() => addCursor(element), executionTime)
         return text.substring(0, text.length - 1)
     }
 
@@ -78,7 +82,7 @@ const ketikin = (selector, options) => {
             }
 
             // clear residual text
-            setTimeout(() => swapTypingText(element, typingText) | addTypingBar(element), executionTime)
+            setTimeout(() => swapTypingText(element, typingText) | addCursor(element), executionTime)
         }
 
         return executionTime
