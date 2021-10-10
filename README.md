@@ -35,6 +35,6 @@ Ketikin is a lightweight Javascript library to help you create a typewriter anim
 ```
 5. Done 🥳🐛
 
-## Example
+## Demo
 #### Visit <a target="_blank" href="https://fachr.in">my website</a> for a smoother demo. The GIF frame rate below is dropped.
 ![ketikin](https://user-images.githubusercontent.com/14908455/136647330-2c36de7d-cdc4-4abd-bb42-5ae418d58adf.gif)
