@@ -61,28 +61,24 @@ const ketikin = (selector, options) => {
     }
 
     orchestrate = (element, text, shouldBackSpacing, executionTime) => {
-        let typingText = text
-
-        // clear text first before typing
         clearText(element)
 
-        for(const char of typingText) {
+        for(const char of text) {
             type(element, char, executionTime)
             executionTime = arrangeExecutionTime(executionTime, baseTypingSpeed)
         }
 
         if(shouldBackSpacing) {
-            backSpacingSpeed = baseTypingSpeed
+            let backSpacingSpeed = baseTypingSpeed
             executionTime = executionTime + defaultTimeGap
             
-            while(typingText) {
-                typingText = backSpace(element, typingText, executionTime)
+            while(text) {
+                text = backSpace(element, text, executionTime)
                 executionTime = arrangeExecutionTime(executionTime, backSpacingSpeed)
                 backSpacingSpeed = Math.floor(backSpacingSpeed * 0.7)
             }
 
-            // clear residual text
-            setTimeout(() => swapTypingText(element, typingText) | addCursor(element), executionTime)
+            setTimeout(() => swapTypingText(element, text) | addCursor(element), executionTime)
         }
 
         return executionTime
