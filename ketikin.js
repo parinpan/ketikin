@@ -105,10 +105,10 @@ const ketikin = (selector, options) => {
         }
     }
 
-    document.querySelectorAll(selector).forEach((element, index) => {
+    document.querySelectorAll(selector).forEach(element => {
         let elementText = element.innerText
         element.innerHTML = invisibleChar
-        element.setAttribute('ketikin-seq', 'ketikin-' + index)
+        element.setAttribute('ketikin-seq', 'seq-' + Math.random().toString(36).substr(2))
         playOrchestration(element, (options.texts || [elementText]).filter(text => text))
     })
 }
