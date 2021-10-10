@@ -7,7 +7,7 @@ const ketikin = (selector, options) => {
     const cursorID = 'ketikin-cursor'
 
     options = Object.assign({
-        texts: [],
+        texts: null,
         speed: 0,
         loop: false
     }, options)
