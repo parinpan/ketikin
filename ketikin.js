@@ -114,7 +114,9 @@ const ketikin = (selector, options) => {
     document.querySelectorAll(selector).forEach(element => {
         const opts = setupOptions(options)
         const texts = setupTexts(element, opts)
-        const el = setupElement(element)
-        playOrchestration(el, texts, opts)
+
+        if(texts.length > 0) {
+            playOrchestration(setupElement(element), texts, opts)
+        }
     })
 }
