@@ -4,7 +4,7 @@ const ketikin = (selector, options) => {
     const defaultTimeGap = 1000
 
     const invisibleChar = '&lrm;'
-    const cursorID = 'ketikin-cursor'
+    const cursor = '<span id="{id}">|</span>'
 
     options = Object.assign({
         texts: null,
@@ -19,18 +19,12 @@ const ketikin = (selector, options) => {
         return speed
     }
 
-    createCursor = () => {
-        let cursor = document.createElement("span")
-        let cursorContent = document.createTextNode("|")
-
-        cursor.id = cursorID
-        cursor.appendChild(cursorContent)
-
-        return cursor
+    getSeq = (element) => {
+        return element.getAttribute('ketikin-seq')   
     }
 
     getCursor = (element) => {
-        return element.querySelector('#' + cursorID) || document.createElement("cursor")
+        return element.querySelector('#' + getSeq(element)) || document.createElement("cursor")
     }
 
     animateCursor = (element) => {
@@ -45,7 +39,7 @@ const ketikin = (selector, options) => {
     }
 
     addCursor = (element) => {
-        element.appendChild(createCursor())
+        element.innerHTML = element.innerHTML + cursor.replace('{id}', getSeq(element))
     }
 
     addTypingChar = (element, char) => {
@@ -69,17 +63,11 @@ const ketikin = (selector, options) => {
         return text.substring(0, text.length - 1)
     }
 
-    clearText = (element) => {
-        element.innerHTML = invisibleChar
-    }
-
     arrangeExecutionTime = (lastExecutionTime, speedBaseline) => {
         return lastExecutionTime + Math.floor(Math.random() * fenceSpeed(options.speed)) + speedBaseline
     }
 
     orchestrate = (element, text, shouldBackSpacing, executionTime) => {
-        clearText(element)
-
         for(const char of text) {
             type(element, char, executionTime)
             executionTime = arrangeExecutionTime(executionTime, baseTypingSpeed)
@@ -117,7 +105,10 @@ const ketikin = (selector, options) => {
         }
     }
 
-    document.querySelectorAll(selector).forEach(element => {
-        playOrchestration(element, (options.texts || [element.innerText]).filter(text => text))
+    document.querySelectorAll(selector).forEach((element, index) => {
+        let elementText = element.innerText
+        element.innerHTML = invisibleChar
+        element.setAttribute('ketikin-seq', 'ketikin-' + index)
+        playOrchestration(element, (options.texts || [elementText]).filter(text => text))
     })
 }
