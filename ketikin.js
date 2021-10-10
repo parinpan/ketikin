@@ -12,7 +12,7 @@ const ketikin = (selector, options) => {
         loop: false
     }, options)
 
-    adjustSpeed = (speed) => {
+    fenceSpeed = (speed) => {
         speed = speed > maxTypingSpeed ? maxTypingSpeed : speed
         speed = speed < 0 ? 0 : speed
         speed = maxTypingSpeed - speed
@@ -74,7 +74,7 @@ const ketikin = (selector, options) => {
     }
 
     arrangeExecutionTime = (lastExecutionTime, speedBaseline) => {
-        return lastExecutionTime + Math.floor(Math.random() * adjustSpeed(options.speed)) + speedBaseline
+        return lastExecutionTime + Math.floor(Math.random() * fenceSpeed(options.speed)) + speedBaseline
     }
 
     orchestrate = (element, text, shouldBackSpacing, executionTime) => {
