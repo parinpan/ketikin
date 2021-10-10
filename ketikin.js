@@ -2,15 +2,7 @@ const ketikin = (selector, options) => {
     const baseTypingSpeed = 5
     const maxTypingSpeed = 100
     const defaultTimeGap = 1000
-
-    const invisibleChar = '&lrm;'
     const cursor = '<span id="{id}">|</span>'
-
-    options = Object.assign({
-        texts: null,
-        speed: 0,
-        loop: false
-    }, options)
 
     fenceSpeed = (speed) => {
         speed = speed > maxTypingSpeed ? maxTypingSpeed : speed
@@ -44,22 +36,18 @@ const ketikin = (selector, options) => {
 
     addTypingChar = (element, char) => {
         element.innerHTML = element.innerHTML + char
-        removeCursor(element)
     }
 
     swapTypingText = (element, text) => {
         element.innerHTML = text
-        removeCursor(element)
     }
 
     type = (element, char, executionTime) => {
-        setTimeout(() => addTypingChar(element, char), executionTime)
-        setTimeout(() => addCursor(element), executionTime)
+        setTimeout(() => removeCursor(element) | addTypingChar(element, char) | addCursor(element), executionTime)
     }
 
     backSpace = (element, text, executionTime) => {
-        setTimeout(() => swapTypingText(element, text), executionTime)
-        setTimeout(() => addCursor(element), executionTime)
+        setTimeout(() => removeCursor(element) | swapTypingText(element, text) | addCursor(element), executionTime)
         return text.substring(0, text.length - 1)
     }
 
@@ -89,26 +77,44 @@ const ketikin = (selector, options) => {
         return executionTime
     }
 
-    playOrchestration = (element, texts) => {
+    playOrchestration = (element, texts, opts) => {
         let executionTime = 0
         let shouldBackSpacing = false
 
         texts.forEach((text, index) => {
-            shouldBackSpacing = (index < texts.length - 1 && !options.loop) || options.loop
+            shouldBackSpacing = (index < texts.length - 1 && !opts.loop) || opts.loop
             executionTime = orchestrate(element, text, shouldBackSpacing, executionTime) + defaultTimeGap
         })
 
-        if(options.loop) {
-            setTimeout(() => playOrchestration(element, texts), executionTime)
+        if(opts.loop) {
+            setTimeout(() => playOrchestration(element, texts, opts), executionTime)
         } else {
             setTimeout(() => animateCursor(element), executionTime)
         }
     }
 
-    document.querySelectorAll(selector).forEach(element => {
-        let elementText = element.innerText
-        element.innerHTML = invisibleChar
+    setupOptions = (opts) => {
+        return Object.assign({
+            texts: null,
+            speed: 0,
+            loop: false
+        }, opts)
+    }
+
+    setupTexts = (element, opts) => {
+        return (opts.texts || [element.innerText]).filter(text => text)
+    }
+
+    setupElement = (element) => {
         element.setAttribute('ketikin-seq', 'seq-' + Math.random().toString(36).substr(2))
-        playOrchestration(element, (options.texts || [elementText]).filter(text => text))
+        element.innerHTML = ""
+        return element
+    }
+
+    document.querySelectorAll(selector).forEach(element => {
+        const opts = setupOptions(options)
+        const texts = setupTexts(element, opts)
+        const el = setupElement(element)
+        playOrchestration(el, texts, opts)
     })
 }
